@@ -1,13 +1,8 @@
 package com.nostratech.mahdi.androidannotations.addeditcontact;
 
-import android.annotation.SuppressLint;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.nostratech.mahdi.androidannotations.R;
@@ -15,55 +10,54 @@ import com.nostratech.mahdi.androidannotations.model.Contact;
 import com.nostratech.mahdi.androidannotations.model.source.ContactDao;
 import com.nostratech.mahdi.androidannotations.util.DbProvider;
 
+import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
+import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_add_edit_contact)
 public class AddEditContactActivity extends AppCompatActivity {
 
     private ContactDao contactDao;
 
     public static final int CODE_EDIT_CONTACT = 555;
 
-    private TextInputLayout firstNameLayout;
-    private TextInputEditText firstName;
-    private TextInputLayout lastNameLayout;
-    private TextInputEditText lastName;
-    private TextInputLayout phoneNumberLayout;
-    private TextInputEditText phoneNumber;
-    private TextInputLayout homeAddressLayout;
-    private TextInputEditText homeAddress;
+    @ViewById
+    TextInputLayout firstNameLayout;
+    @ViewById
+    TextInputEditText firstName;
+    @ViewById
+    TextInputLayout lastNameLayout;
+    @ViewById
+    TextInputEditText lastName;
+    @ViewById
+    TextInputLayout phoneNumberLayout;
+    @ViewById
+    TextInputEditText phoneNumber;
+    @ViewById
+    TextInputLayout homeAddressLayout;
+    @ViewById
+    TextInputEditText homeAddress;
 
-    private int code;
-    private long contactId;
+    @Extra
+    int code;
+    @Extra
+    long contactId;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    @Click
+    void fab() {
+        if (contactIsValid()) saveContact(bindRequest());
+    }
 
-        code = getIntent().getIntExtra("code", -1);
-
-        setContentView(R.layout.activity_add_edit_contact);
-
+    @AfterViews
+    void init() {
         contactDao = new DbProvider().getDb(this).contactDao();
-
-        firstNameLayout = findViewById(R.id.firstNameLayout);
-        lastNameLayout = findViewById(R.id.lastNameLayout);
-        phoneNumberLayout = findViewById(R.id.phoneNumberLayout);
-        homeAddressLayout = findViewById(R.id.homeAddressLayout);
-        firstName = findViewById(R.id.firstName);
-        lastName = findViewById(R.id.lastName);
-        phoneNumber = findViewById(R.id.phoneNumber);
-        homeAddress = findViewById(R.id.homeAddress);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (contactIsValid()) new saveContact(bindRequest()).execute();
-            }
-        });
-
         if (code == CODE_EDIT_CONTACT) bindViews();
         else clearViews();
     }
-
 
     private boolean contactIsValid() {
         if (firstName.getText() == null)
@@ -83,9 +77,13 @@ public class AddEditContactActivity extends AppCompatActivity {
         return false;
     }
 
-    private void bindViews() {
-        contactId = getIntent().getLongExtra("contactId", -1);
-        new bindContact(contactId).execute();
+    @Background
+    void bindViews() {
+        Contact contact = contactDao.getContact(contactId);
+        firstName.setText(contact.firstName);
+        lastName.setText(contact.lastName);
+        phoneNumber.setText(contact.phoneNumber);
+        homeAddress.setText(contact.homeAddress);
     }
 
     private Contact bindRequest() {
@@ -105,47 +103,16 @@ public class AddEditContactActivity extends AppCompatActivity {
         homeAddress.setText("");
     }
 
-    @SuppressLint("StaticFieldLeak")
-    class bindContact extends AsyncTask<Void, Void, Contact> {
-        private final long contactId;
-
-        bindContact(long contactId) {
-            this.contactId = contactId;
-        }
-
-        @Override
-        protected Contact doInBackground(Void... params) {
-            return contactDao.getContact(contactId);
-        }
-
-        @Override
-        protected void onPostExecute(Contact contact) {
-            firstName.setText(contact.firstName);
-            lastName.setText(contact.lastName);
-            phoneNumber.setText(contact.phoneNumber);
-            homeAddress.setText(contact.homeAddress);
-        }
+    @Background
+    void saveContact(Contact contact) {
+        if (code == CODE_EDIT_CONTACT) contactDao.update(contact);
+        else contactDao.insert(contact);
+        showSaved();
     }
 
-    @SuppressLint("StaticFieldLeak")
-    class saveContact extends AsyncTask<Void, Void, Void> {
-        private final Contact contact;
-
-        saveContact(Contact contact) {
-            this.contact = contact;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (code == CODE_EDIT_CONTACT) contactDao.update(contact);
-            else contactDao.insert(contact);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            Toast.makeText(AddEditContactActivity.this, "Contact saved", Toast.LENGTH_SHORT).show();
-            AddEditContactActivity.this.finish();
-        }
+    @UiThread
+    void showSaved() {
+        Toast.makeText(AddEditContactActivity.this, "Contact saved", Toast.LENGTH_SHORT).show();
+        AddEditContactActivity.this.finish();
     }
 }

@@ -42,15 +42,6 @@ public class ListContactAdapter extends RecyclerView.Adapter<ListContactAdapter.
     public void onBindViewHolder(ContactViewHolder holder, int position) {
         final Contact contact = contactList.get(position);
         holder.bindView(contact);
-        holder.placeholder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(context, AddEditContactActivity.class);
-                i.putExtra("code", AddEditContactActivity.CODE_EDIT_CONTACT);
-                i.putExtra("contactId", contact.id);
-                context.startActivity(i);
-            }
-        });
     }
 
     @Override
@@ -69,8 +60,17 @@ public class ListContactAdapter extends RecyclerView.Adapter<ListContactAdapter.
         }
 
         @SuppressLint("SetTextI18n")
-        void bindView(Contact contact) {
+        void bindView(final Contact contact) {
             fullName.setText(contact.firstName + " " + contact.lastName);
+            placeholder.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent i = new Intent(context, AddEditContactActivity.class);
+                    i.putExtra("code", AddEditContactActivity.CODE_EDIT_CONTACT);
+                    i.putExtra("contactId", contact.id);
+                    context.startActivity(i);
+                }
+            });
         }
     }
 }
