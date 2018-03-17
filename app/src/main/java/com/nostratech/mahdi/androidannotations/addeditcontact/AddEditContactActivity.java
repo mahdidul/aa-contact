@@ -22,6 +22,7 @@ import org.androidannotations.annotations.ViewById;
 public class AddEditContactActivity extends AppCompatActivity {
 
     private ContactDao contactDao;
+    private Contact contact;
 
     public static final int CODE_EDIT_CONTACT = 555;
 
@@ -47,16 +48,15 @@ public class AddEditContactActivity extends AppCompatActivity {
     @Extra
     long contactId;
 
-    @Click
-    void fab() {
+    @Click(R.id.fab)
+    void onClickFab() {
         if (contactIsValid()) saveContact(bindRequest());
     }
 
     @AfterViews
     void init() {
         contactDao = new DbProvider().getDb(this).contactDao();
-        if (code == CODE_EDIT_CONTACT) bindViews();
-        else clearViews();
+        if (code == CODE_EDIT_CONTACT) initContact();
     }
 
     private boolean contactIsValid() {
@@ -78,8 +78,13 @@ public class AddEditContactActivity extends AppCompatActivity {
     }
 
     @Background
+    void initContact() {
+        contact = contactDao.getContact(contactId);
+        bindViews();
+    }
+
+    @UiThread
     void bindViews() {
-        Contact contact = contactDao.getContact(contactId);
         firstName.setText(contact.firstName);
         lastName.setText(contact.lastName);
         phoneNumber.setText(contact.phoneNumber);
@@ -94,13 +99,6 @@ public class AddEditContactActivity extends AppCompatActivity {
         contact.phoneNumber = phoneNumber.getText().toString();
         contact.homeAddress = homeAddress.getText().toString();
         return contact;
-    }
-
-    private void clearViews() {
-        firstName.setText("");
-        lastName.setText("");
-        phoneNumber.setText("");
-        homeAddress.setText("");
     }
 
     @Background

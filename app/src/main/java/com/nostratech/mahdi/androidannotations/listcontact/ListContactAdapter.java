@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.nostratech.mahdi.androidannotations.R;
-import com.nostratech.mahdi.androidannotations.addeditcontact.AddEditContactActivity;
+import com.nostratech.mahdi.androidannotations.addeditcontact.AddEditContactActivity_;
 import com.nostratech.mahdi.androidannotations.model.Contact;
 
 import java.util.List;
@@ -65,10 +65,10 @@ public class ListContactAdapter extends RecyclerView.Adapter<ListContactAdapter.
             placeholder.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent i = new Intent(context, AddEditContactActivity.class);
-                    i.putExtra("code", AddEditContactActivity.CODE_EDIT_CONTACT);
-                    i.putExtra("contactId", contact.id);
-                    context.startActivity(i);
+                    AddEditContactActivity_.intent(context)
+                            .extra("code", AddEditContactActivity_.CODE_EDIT_CONTACT)
+                            .extra("contactId", contact.id)
+                            .start();
                 }
             });
         }

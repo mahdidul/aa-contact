@@ -23,8 +23,8 @@ public class ListContactActivity extends AppCompatActivity {
     @ViewById
     RecyclerView recycler;
 
-    private ListContactAdapter adapter;
     private ContactDao contactDao;
+    private ListContactAdapter adapter;
 
     @Click
     void fab() {
@@ -34,25 +34,26 @@ public class ListContactActivity extends AppCompatActivity {
     @AfterViews
     void init() {
         contactDao = new DbProvider().getDb(this).contactDao();
-    }
-
-    @UiThread
-    void bindViews() {
-        initAdapter();
         recycler.setLayoutManager(new LinearLayoutManager(this));
         recycler.addItemDecoration(new SimpleDividerItemDecoration(this));
-        recycler.setAdapter(adapter);
+        initAdapter();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initAdapter();
     }
 
     @Background
     void initAdapter() {
         adapter = new ListContactAdapter(
                 ListContactActivity.this, contactDao.getContacts());
+        bindViews();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        bindViews();
+    @UiThread
+    void bindViews() {
+        recycler.setAdapter(adapter);
     }
 }
