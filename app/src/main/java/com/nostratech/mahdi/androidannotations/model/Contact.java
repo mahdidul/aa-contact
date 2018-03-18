@@ -4,11 +4,6 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
-/**
- * Created by Mahdi on 28/02/18.
- * Part of AndroidAnnotations
- */
-
 @Entity(tableName = "contact")
 public class Contact {
     @PrimaryKey(autoGenerate = true)

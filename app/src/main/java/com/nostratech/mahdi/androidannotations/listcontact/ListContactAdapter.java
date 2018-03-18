@@ -16,11 +16,6 @@ import com.nostratech.mahdi.androidannotations.model.Contact;
 
 import java.util.List;
 
-/**
- * Created by Mahdi on 28/02/18.
- * Part of AndroidAnnotations
- */
-
 public class ListContactAdapter extends RecyclerView.Adapter<ListContactAdapter.ContactViewHolder> {
 
     private final Context context;

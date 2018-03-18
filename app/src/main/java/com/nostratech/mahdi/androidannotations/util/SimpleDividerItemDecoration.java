@@ -10,11 +10,6 @@ import android.view.View;
 
 import com.nostratech.mahdi.androidannotations.R;
 
-/**
- * Created by Mahdi on 01/03/18.
- * Part of AndroidAnnotations
- */
-
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable mDivider;
     private Context mContext;
